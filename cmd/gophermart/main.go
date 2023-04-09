@@ -25,9 +25,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apiImpl := server.NewServer(dbStorage)
+	apiImpl := server.NewServer(dbStorage, *c)
 
-	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("auth", middlewares.Auth)))
+	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("auth", middlewares.Auth(*c))))
 
 	log.Fatal(http.ListenAndServe(c.ServerAddress, r))
 }

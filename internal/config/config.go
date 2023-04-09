@@ -9,11 +9,13 @@ import (
 const RunAddress = "http://localhost:8080"
 const DatabaseUri = "postgresql://localhost:5432/postgres"
 const AccrualSystemAddress = "http://localhost:8081"
+const JwtSecret = "secret"
 
 type Config struct {
 	ServerAddress        string `env:"SERVER_ADDRESS"`
 	DataBaseURI          string `env:"DATABASE_URI"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
+	JWTSecret            string `env:"JWT_SECRET"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -27,6 +29,7 @@ func LoadConfig() (*Config, error) {
 	flag.StringVar(&flagsConfig.ServerAddress, "a", RunAddress, "server address")
 	flag.StringVar(&flagsConfig.DataBaseURI, "d", DatabaseUri, "database uri")
 	flag.StringVar(&flagsConfig.AccrualSystemAddress, "r", AccrualSystemAddress, "accrual system address")
+	flag.StringVar(&flagsConfig.JWTSecret, "j", JwtSecret, "jwt secret")
 	flag.Parse()
 
 	if config.ServerAddress == "" {
@@ -39,6 +42,10 @@ func LoadConfig() (*Config, error) {
 
 	if config.AccrualSystemAddress == "" {
 		config.AccrualSystemAddress = flagsConfig.AccrualSystemAddress
+	}
+
+	if config.JWTSecret == "" {
+		config.JWTSecret = flagsConfig.JWTSecret
 	}
 
 	return &config, nil

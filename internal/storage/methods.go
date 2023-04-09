@@ -2,13 +2,27 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"time"
 )
+
+var ErrUserExists = errors.New("user exists")
+var ErrUserNotFound = errors.New("user not found")
 
 func (s *DBStorage) CreateUser(email, password string) error {
 	_, err := s.Pool.Exec(context.Background(), `INSERT INTO users (email, password) VALUES ($1, $2)`, email, password)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *DBStorage) ValidateUser(email, password string) error {
+	var userID string
+	err := s.Pool.QueryRow(context.Background(), `SELECT id FROM users WHERE email = $1 AND password = $2`, email, password).Scan(&userID)
+	if err != nil {
+		return ErrUserNotFound
 	}
 
 	return nil

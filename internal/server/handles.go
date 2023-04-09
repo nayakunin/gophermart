@@ -1,15 +1,18 @@
 package server
 
 import (
+	"github.com/nayakunin/gophermart/internal/config"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
 
 type Server struct {
-	storage *storage.DBStorage
+	Storage *storage.DBStorage
+	Cfg     config.Config
 }
 
-func NewServer(dbStorage *storage.DBStorage) Server {
+func NewServer(dbStorage *storage.DBStorage, cfg config.Config) Server {
 	return Server{
-		storage: dbStorage,
+		Storage: dbStorage,
+		Cfg:     cfg,
 	}
 }
