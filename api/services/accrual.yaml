@@ -1,0 +1,52 @@
+openapi: 3.0.3
+info:
+  title: Accrual
+  description: Accrual
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /api/orders/{number}:
+    get:
+      summary: Get order
+      description: Get order
+      parameters:
+        - name: number
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+        '429':
+          description: Too many requests
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    OrderStatus:
+      type: string
+      enum:
+        - NEW
+        - PROCESSING
+        - INVALID
+        - PROCESSED
+    Order:
+      type: object
+      required: [ order, status ]
+      properties:
+        order:
+          type: string
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        accrual:
+          type: integer

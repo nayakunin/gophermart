@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: Gophermart
+  description: Gophermart
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+    description: Local server
+paths:
+  /api/user/register:
+    post:
+      summary: Register user
+      description: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '409':
+          description: Conflict
+        '500':
+          description: Internal server error
+  /api/user/login:
+    post:
+      summary: Login user
+      description: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /api/user/orders:
+    x-go-middlewares: [auth]
+    post:
+      summary: Create user order
+      description: Create user order
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Has already been created
+        '202':
+          description: Accepted
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '409':
+          description: Conflict
+        '422':
+          description: Unprocessable entity
+        '500':
+          description: Internal server error
+    get:
+      summary: Get user orders
+      description: Get user orders
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrdersReply'
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /api/user/balance:
+    x-go-middlewares: [auth]
+    get:
+      summary: Get user balance
+      description: Get user balance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /api/user/balance/withdraw:
+    x-go-middlewares: [auth]
+    post:
+      summary: Withdraw user balance
+      description: Withdraw user balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceWithdrawRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '422':
+          description: Unprocessable entity
+        '500':
+          description: Internal server error
+  /api/user/withdrawals:
+    x-go-middlewares: [auth]
+    get:
+      summary: Get user withdrawals
+      description: Get user withdrawals
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserWithdrawalsReply'
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    RegisterUserRequest:
+      type: object
+      required: [ login, password ]
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+          format: password
+    OrderStatus:
+      type: string
+      enum:
+        - NEW
+        - PROCESSING
+        - INVALID
+        - PROCESSED
+    GetOrdersOrder:
+      type: object
+      required: [ number, status, updated_at ]
+      properties:
+        number:
+          type: string
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        accrual:
+          type: number
+        updated_at:
+          type: string
+          format: date-time
+    GetOrdersReply:
+      type: object
+      required: [ orders ]
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetOrdersOrder'
+    Balance:
+      type: object
+      required: [ current, withdrawn ]
+      properties:
+        current:
+          type: number
+        withdrawn:
+          type: number
+    BalanceWithdrawRequest:
+      type: object
+      required: [ order, sum ]
+      properties:
+        order:
+          type: string
+        sum:
+          type: number
+    GetUserWithdrawalsReply:
+      type: array
+      items:
+        type: object
+        required: [ order, sum, processed_at ]
+        properties:
+          order:
+            type: string
+          sum:
+            type: number
+          processed_at:
+            type: string
+            format: date-time
