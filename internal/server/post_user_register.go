@@ -6,11 +6,12 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/nayakunin/gophermart/internal/auth"
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
 
-func (s Server) PostAPIUserRegister(_ http.ResponseWriter, r *http.Request) *api.Response {
+func (s Server) PostAPIUserRegister(w http.ResponseWriter, r *http.Request) *api.Response {
 	response := api.Response{}
 
 	body, err := io.ReadAll(r.Body)
@@ -35,6 +36,16 @@ func (s Server) PostAPIUserRegister(_ http.ResponseWriter, r *http.Request) *api
 		}
 		return response.Status(http.StatusInternalServerError)
 	}
+
+	tokenString, err := auth.CreateToken(req.Login, s.Cfg.JWTSecret)
+	if err != nil {
+		return response.Status(http.StatusInternalServerError)
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:  "auth",
+		Value: tokenString,
+	})
 
 	return response.Status(http.StatusOK)
 }

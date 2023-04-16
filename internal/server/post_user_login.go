@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/nayakunin/gophermart/internal/auth"
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
@@ -37,11 +37,7 @@ func (s Server) PostAPIUserLogin(w http.ResponseWriter, r *http.Request) *api.Re
 		return response.Status(http.StatusInternalServerError)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"login": req.Login,
-	})
-
-	tokenString, err := token.SignedString([]byte(s.Cfg.JWTSecret))
+	tokenString, err := auth.CreateToken(req.Login, s.Cfg.JWTSecret)
 	if err != nil {
 		return response.Status(http.StatusInternalServerError)
 	}
