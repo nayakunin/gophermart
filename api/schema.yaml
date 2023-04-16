@@ -201,13 +201,15 @@ components:
     GetUserWithdrawalsReply:
       type: array
       items:
-        type: object
-        required: [ order, sum, processed_at ]
-        properties:
-          order:
-            type: string
-          sum:
-            type: number
-          processed_at:
-            type: string
-            format: date-time
+        $ref: '#/components/schemas/GetUserWithdrawalsReplyItem'
+    GetUserWithdrawalsReplyItem:
+      type: object
+      required: [ order, sum, processed_at ]
+      properties:
+        order:
+          type: string
+        sum:
+          type: number
+        processed_at:
+          type: string
+          format: date-time

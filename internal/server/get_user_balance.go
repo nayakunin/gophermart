@@ -6,9 +6,16 @@ import (
 	api "github.com/nayakunin/gophermart/internal/generated"
 )
 
-func (Server) GetAPIUserBalance(w http.ResponseWriter, r *http.Request) *api.Response {
+func (s Server) GetAPIUserBalance(_ http.ResponseWriter, r *http.Request) *api.Response {
+	userID := r.Context().Value("login").(string)
+
+	current, withdrawn, err := s.Storage.GetBalance(userID)
+	if err != nil {
+		return nil
+	}
+
 	return api.GetAPIUserBalanceJSON200Response(api.Balance{
-		Current:   0,
-		Withdrawn: 0,
+		Current:   current,
+		Withdrawn: withdrawn,
 	})
 }

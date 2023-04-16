@@ -2,15 +2,27 @@ package server
 
 import (
 	"net/http"
-	"time"
+	"strconv"
 
 	api "github.com/nayakunin/gophermart/internal/generated"
 )
 
-func (Server) GetAPIUserWithdrawals(w http.ResponseWriter, r *http.Request) *api.Response {
-	return api.GetAPIUserWithdrawalsJSON200Response(api.GetUserWithdrawalsReply{{
-		Order:       "",
-		ProcessedAt: time.Time{},
-		Sum:         0,
-	}})
+func (s Server) GetAPIUserWithdrawals(_ http.ResponseWriter, r *http.Request) *api.Response {
+	userID := r.Context().Value("login").(string)
+
+	withdrawals, err := s.Storage.GetWithdrawals(userID)
+	if err != nil {
+		return nil
+	}
+
+	var apiWithdrawals []api.GetUserWithdrawalsReplyItem
+	for _, withdrawal := range withdrawals {
+		apiWithdrawals = append(apiWithdrawals, api.GetUserWithdrawalsReplyItem{
+			Order:       strconv.FormatInt(withdrawal.OrderID, 10),
+			ProcessedAt: withdrawal.ProcessedAt,
+			Sum:         withdrawal.Amount,
+		})
+	}
+
+	return api.GetAPIUserWithdrawalsJSON200Response(apiWithdrawals)
 }

@@ -53,7 +53,10 @@ type GetOrdersReply struct {
 }
 
 // GetUserWithdrawalsReply defines model for GetUserWithdrawalsReply.
-type GetUserWithdrawalsReply []struct {
+type GetUserWithdrawalsReply []GetUserWithdrawalsReplyItem
+
+// GetUserWithdrawalsReplyItem defines model for GetUserWithdrawalsReplyItem.
+type GetUserWithdrawalsReplyItem struct {
 	Order       string    `json:"order"`
 	ProcessedAt time.Time `json:"processed_at"`
 	Sum         float32   `json:"sum"`

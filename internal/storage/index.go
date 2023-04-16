@@ -32,8 +32,8 @@ func initDB(conn *pgxpool.Conn) error {
 	_, err = conn.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS balance (
 		id SERIAL PRIMARY KEY,
 		user_id INTEGER NOT NULL,
-		amount INTEGER NOT NULL,
-		withdrawn INTEGER NOT NULL,
+		amount FLOAT NOT NULL,
+		withdrawn FLOAT NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
 	if err != nil {
@@ -43,7 +43,7 @@ func initDB(conn *pgxpool.Conn) error {
 		id SERIAL PRIMARY KEY,
 		user_id INTEGER NOT NULL,
 		order_id INTEGER NOT NULL,
-		amount INTEGER NOT NULL,
+		amount FLOAT NOT NULL,
 		processed_at TIMESTAMP NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(id),
 		FOREIGN KEY (order_id) REFERENCES orders(id)
