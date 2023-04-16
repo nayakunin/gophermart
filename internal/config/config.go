@@ -7,7 +7,7 @@ import (
 )
 
 const RunAddress = "http://localhost:8080"
-const DatabaseUri = "postgresql://localhost:5432/postgres"
+const DatabaseURI = "postgresql://localhost:5432/postgres"
 const AccrualSystemAddress = "http://localhost:8081"
 const JwtSecret = "secret"
 
@@ -27,7 +27,7 @@ func LoadConfig() (*Config, error) {
 
 	flagsConfig := new(Config)
 	flag.StringVar(&flagsConfig.ServerAddress, "a", RunAddress, "server address")
-	flag.StringVar(&flagsConfig.DataBaseURI, "d", DatabaseUri, "database uri")
+	flag.StringVar(&flagsConfig.DataBaseURI, "d", DatabaseURI, "database uri")
 	flag.StringVar(&flagsConfig.AccrualSystemAddress, "r", AccrualSystemAddress, "accrual system address")
 	flag.StringVar(&flagsConfig.JWTSecret, "j", JwtSecret, "jwt secret")
 	flag.Parse()
