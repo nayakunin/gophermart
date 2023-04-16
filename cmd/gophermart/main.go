@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/nayakunin/gophermart/internal/config"
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/middlewares"
@@ -14,6 +15,8 @@ import (
 
 func main() {
 	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
 
 	c, err := config.LoadConfig()
 	if err != nil {
