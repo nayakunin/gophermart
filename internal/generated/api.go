@@ -41,16 +41,14 @@ type BalanceWithdrawRequest struct {
 
 // GetOrdersOrder defines model for GetOrdersOrder.
 type GetOrdersOrder struct {
-	Accrual   *float32    `json:"accrual,omitempty"`
-	Number    string      `json:"number"`
-	Status    OrderStatus `json:"status"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	Accrual    *float32    `json:"accrual,omitempty"`
+	Number     string      `json:"number"`
+	Status     OrderStatus `json:"status"`
+	UploadedAt time.Time   `json:"uploaded_at"`
 }
 
 // GetOrdersReply defines model for GetOrdersReply.
-type GetOrdersReply struct {
-	Orders []GetOrdersOrder `json:"orders"`
-}
+type GetOrdersReply []GetOrdersOrder
 
 // GetUserWithdrawalsReply defines model for GetUserWithdrawalsReply.
 type GetUserWithdrawalsReply []GetUserWithdrawalsReplyItem

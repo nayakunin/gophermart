@@ -21,19 +21,20 @@ func initDB(conn *pgxpool.Conn) error {
 	}
 	_, err = conn.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS orders (
 		id SERIAL PRIMARY KEY,
+		order_id bigint UNIQUE NOT NULL,
 		user_id INTEGER NOT NULL,
 		status VARCHAR(255) NOT NULL,
-		uploaded_at TIMESTAMP NOT NULL,
+		uploaded_at TIMESTAMP NOT NULL DEFAULT now(),
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
 	if err != nil {
 		return err
 	}
-	_, err = conn.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS balance (
+	_, err = conn.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS balances (
 		id SERIAL PRIMARY KEY,
 		user_id INTEGER NOT NULL,
-		amount FLOAT NOT NULL,
-		withdrawn FLOAT NOT NULL,
+		amount numeric(10, 2) NOT NULL,
+		withdrawn numeric(10, 2) NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
 	if err != nil {
@@ -42,11 +43,11 @@ func initDB(conn *pgxpool.Conn) error {
 	_, err = conn.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS transactions (
 		id SERIAL PRIMARY KEY,
 		user_id INTEGER NOT NULL,
-		order_id INTEGER NOT NULL,
-		amount FLOAT NOT NULL,
+		order_id bigint NOT NULL,
+		amount numeric(10, 2) NOT NULL,
 		processed_at TIMESTAMP NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(id),
-		FOREIGN KEY (order_id) REFERENCES orders(id)
+		FOREIGN KEY (order_id) REFERENCES orders(order_id)
 	)`)
 	if err != nil {
 		return err

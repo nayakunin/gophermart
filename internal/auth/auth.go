@@ -1,12 +1,14 @@
 package auth
 
 import (
+	"strconv"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateToken(login, secret string) (string, error) {
+func CreateToken(userID int64, secret string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"login": login,
+		"userID": strconv.FormatInt(userID, 10),
 	})
 
 	tokenString, err := token.SignedString([]byte(secret))

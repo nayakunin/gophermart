@@ -163,7 +163,7 @@ components:
         - PROCESSED
     GetOrdersOrder:
       type: object
-      required: [ number, status, updated_at ]
+      required: [ number, status, uploaded_at ]
       properties:
         number:
           type: string
@@ -171,17 +171,13 @@ components:
           $ref: '#/components/schemas/OrderStatus'
         accrual:
           type: number
-        updated_at:
+        uploaded_at:
           type: string
           format: date-time
     GetOrdersReply:
-      type: object
-      required: [ orders ]
-      properties:
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetOrdersOrder'
+      type: array
+      items:
+        $ref: '#/components/schemas/GetOrdersOrder'
     Balance:
       type: object
       required: [ current, withdrawn ]

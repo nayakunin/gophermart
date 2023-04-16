@@ -3,10 +3,6 @@ SCHEMA_FILE := ./api/schema.yaml
 GEN_FILE := ./internal/generated/api.go
 PACKAGE_NAME := api
 
-ACCRUAL_SCHEMA_FILE := ./api/services/accrual.yaml
-ACCRUAL_GEN_FILE := ./internal/services/accrual/generated/api.go
-ACCRUAL_PACKAGE_NAME := api
-
 LOCAL_BIN:=$(CURDIR)/bin
 GOAPI_CODEGEN_BIN:=$(LOCAL_BIN)/goapi-gen
 
@@ -23,5 +19,7 @@ GOAPI_CODEGEN_BIN:=$(LOCAL_BIN)/goapi-gen
 # generate code from schema
 .PHONY: all
 generate: .install-opapi-codegen
-	$(GOAPI_CODEGEN_BIN) -generate types -package $(ACCRUAL_PACKAGE_NAME) -out $(ACCRUAL_GEN_FILE) $(ACCRUAL_SCHEMA_FILE)
 	$(GOAPI_CODEGEN_BIN) -generate types,server -package $(PACKAGE_NAME) -out $(GEN_FILE) $(SCHEMA_FILE)
+
+run-accrual:
+	cd ./cmd/accrual && ./accrual_darwin_amd64 -a localhost:8080 -d postgresql://localhost:5432/postgres?sslmode=disable

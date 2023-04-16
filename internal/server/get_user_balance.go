@@ -7,11 +7,13 @@ import (
 )
 
 func (s Server) GetAPIUserBalance(_ http.ResponseWriter, r *http.Request) *api.Response {
-	userID := r.Context().Value("login").(string)
+	response := api.Response{}
+
+	userID := r.Context().Value("userID").(int64)
 
 	current, withdrawn, err := s.Storage.GetBalance(userID)
 	if err != nil {
-		return nil
+		return response.Status(http.StatusInternalServerError)
 	}
 
 	return api.GetAPIUserBalanceJSON200Response(api.Balance{

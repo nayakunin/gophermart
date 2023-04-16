@@ -1,8 +1,10 @@
 package middlewares
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/nayakunin/gophermart/internal/config"
@@ -22,7 +24,7 @@ func Auth(cfg config.Config) func(http.Handler) http.Handler {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
 
-				return cfg.JWTSecret, nil
+				return []byte(cfg.JWTSecret), nil
 			})
 			if err != nil {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -33,6 +35,26 @@ func Auth(cfg config.Config) func(http.Handler) http.Handler {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
+
+			claims, ok := token.Claims.(jwt.MapClaims)
+			if !ok {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			userIDString, ok := claims["userID"].(string)
+			if !ok {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			userID, err := strconv.ParseInt(userIDString, 10, 64)
+			if err != nil {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			r = r.WithContext(context.WithValue(r.Context(), "userID", userID))
 
 			next.ServeHTTP(w, r)
 		})

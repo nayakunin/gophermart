@@ -8,11 +8,12 @@ import (
 )
 
 func (s Server) GetAPIUserWithdrawals(_ http.ResponseWriter, r *http.Request) *api.Response {
-	userID := r.Context().Value("login").(string)
+	response := api.Response{}
+	userID := r.Context().Value("userID").(int64)
 
 	withdrawals, err := s.Storage.GetWithdrawals(userID)
 	if err != nil {
-		return nil
+		return response.Status(http.StatusInternalServerError)
 	}
 
 	var apiWithdrawals []api.GetUserWithdrawalsReplyItem

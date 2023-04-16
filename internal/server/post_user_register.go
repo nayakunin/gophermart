@@ -29,7 +29,7 @@ func (s Server) PostAPIUserRegister(w http.ResponseWriter, r *http.Request) *api
 		return response.Status(http.StatusBadRequest)
 	}
 
-	err = s.Storage.CreateUser(req.Login, req.Password)
+	userID, err := s.Storage.CreateUser(req.Login, req.Password)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExists) {
 			return response.Status(http.StatusConflict)
@@ -37,13 +37,13 @@ func (s Server) PostAPIUserRegister(w http.ResponseWriter, r *http.Request) *api
 		return response.Status(http.StatusInternalServerError)
 	}
 
-	tokenString, err := auth.CreateToken(req.Login, s.Cfg.JWTSecret)
+	tokenString, err := auth.CreateToken(userID, s.Cfg.JWTSecret)
 	if err != nil {
 		return response.Status(http.StatusInternalServerError)
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:  "auth",
+		Name:  "Authentication",
 		Value: tokenString,
 	})
 

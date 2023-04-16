@@ -1,6 +1,10 @@
 package storage
 
-import "time"
+import (
+	"time"
+
+	api "github.com/nayakunin/gophermart/internal/generated"
+)
 
 type User struct {
 	ID       int64
@@ -10,6 +14,7 @@ type User struct {
 
 type Order struct {
 	ID         int64
+	Status     api.OrderStatus
 	UploadedAt time.Time
 }
 

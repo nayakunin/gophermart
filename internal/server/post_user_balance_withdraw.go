@@ -14,7 +14,7 @@ import (
 func (s Server) PostAPIUserBalanceWithdraw(_ http.ResponseWriter, r *http.Request) *api.Response {
 	response := api.Response{}
 
-	userID := r.Context().Value("login").(string)
+	userID := r.Context().Value("userID").(int64)
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

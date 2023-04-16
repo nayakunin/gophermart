@@ -10,6 +10,7 @@ import (
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/middlewares"
 	"github.com/nayakunin/gophermart/internal/server"
+	"github.com/nayakunin/gophermart/internal/services/accrual"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
 
@@ -28,7 +29,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apiImpl := server.NewServer(dbStorage, *c)
+	accrualService := accrual.NewAccrualService(c.AccrualSystemAddress)
+
+	apiImpl := server.NewServer(dbStorage, *c, accrualService)
 
 	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("auth", middlewares.Auth(*c))))
 
