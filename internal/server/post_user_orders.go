@@ -29,7 +29,7 @@ func (s Server) PostAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.R
 		return response.Status(http.StatusUnprocessableEntity)
 	}
 
-	err = s.Storage.SaveOrder(userID, orderID, api.OrderStatusNEW.ToValue())
+	err = s.Storage.SaveOrder(userID, orderID)
 	if err != nil {
 		if errors.Is(err, storage.ErrSaveOrderConflict) {
 			return response.Status(http.StatusConflict)
@@ -42,11 +42,7 @@ func (s Server) PostAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.R
 		return response.Status(http.StatusInternalServerError)
 	}
 
-	// TODO: Figure out how to handle accruals
-	//accrual, err := s.Accrual.GetAccrual(orderID)
-	//if err != nil {
-	//	return response.Status(http.StatusInternalServerError)
-	//}
+	s.Worker.AddOrder(userID, orderID)
 
 	return response.Status(http.StatusAccepted)
 }

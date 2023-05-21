@@ -22,4 +22,4 @@ generate: .install-opapi-codegen
 	$(GOAPI_CODEGEN_BIN) -generate types,server -package $(PACKAGE_NAME) -out $(GEN_FILE) $(SCHEMA_FILE)
 
 run-accrual:
-	cd ./cmd/accrual && ./accrual_darwin_amd64 -a localhost:8080 -d postgresql://localhost:5432/postgres?sslmode=disable
+	cd ./cmd/accrual && ./accrual_darwin_amd64 -a localhost:8081 -d postgresql://localhost:5432/postgres?sslmode=disable

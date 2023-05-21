@@ -16,6 +16,7 @@ type Order struct {
 	ID         int64
 	Status     api.OrderStatus
 	UploadedAt time.Time
+	Accrual    *float32
 }
 
 type Balance struct {

@@ -48,8 +48,8 @@ func (s *DBStorage) GetUserID(email, password string) (int64, error) {
 	return userID, nil
 }
 
-func (s *DBStorage) SaveOrder(userID, orderID int64, status string) error {
-	res, err := s.Pool.Exec(context.Background(), `INSERT INTO orders (order_id, user_id, status) VALUES ($1, $2, $3) ON CONFLICT (order_id) DO NOTHING`, orderID, userID, status)
+func (s *DBStorage) SaveOrder(userID, orderID int64) error {
+	res, err := s.Pool.Exec(context.Background(), `INSERT INTO orders (order_id, user_id, status) VALUES ($1, $2, $3) ON CONFLICT (order_id) DO NOTHING`, orderID, userID, api.OrderStatusNEW.ToValue())
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (s *DBStorage) SaveOrder(userID, orderID int64, status string) error {
 }
 
 func (s *DBStorage) GetOrders(userID int64) ([]Order, error) {
-	rows, err := s.Pool.Query(context.Background(), `SELECT (order_id, status, uploaded_at) FROM orders WHERE user_id = $1`, userID)
+	rows, err := s.Pool.Query(context.Background(), `SELECT (order_id, status, uploaded_at, accrual) FROM orders WHERE user_id = $1`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +83,7 @@ func (s *DBStorage) GetOrders(userID int64) ([]Order, error) {
 			OrderID    int64
 			Status     string
 			UploadedAt time.Time
+			Accrual    *float32
 		}
 		var row orderRow
 		err := rows.Scan(&row)
@@ -98,6 +99,7 @@ func (s *DBStorage) GetOrders(userID int64) ([]Order, error) {
 
 		orders = append(orders, Order{
 			ID:         row.OrderID,
+			Accrual:    row.Accrual,
 			Status:     status,
 			UploadedAt: row.UploadedAt,
 		})
@@ -120,11 +122,11 @@ func (s *DBStorage) GetBalance(userID int64) (float32, float32, error) {
 	return row.Amount, row.Withdraw, err
 }
 
-func (s *DBStorage) Withdraw(userID, order int64, amount float32) error {
+func (s *DBStorage) Withdraw(userID, orderID int64, amount float32) error {
 	conn, _ := s.Pool.Acquire(context.Background())
 
-	// Check if order exists
-	_, err := conn.Exec(context.Background(), `SELECT id FROM orders WHERE order_id = $1 AND user_id = $2`, order, userID)
+	// Check if orderID exists
+	_, err := conn.Exec(context.Background(), `SELECT id FROM orders WHERE order_id = $1 AND user_id = $2`, orderID, userID)
 	if err != nil {
 		return ErrWithdrawOrderNotFound
 	}
@@ -146,7 +148,7 @@ func (s *DBStorage) Withdraw(userID, order int64, amount float32) error {
 	}
 
 	// Save transaction
-	_, err = conn.Exec(context.Background(), `INSERT INTO transactions (user_id, amount) VALUES ($1, $2)`, userID, amount)
+	_, err = conn.Exec(context.Background(), `INSERT INTO transactions (user_id, order_id, amount) VALUES ($1, $2, $3)`, userID, orderID, amount)
 	if err != nil {
 		return err
 	}
@@ -164,20 +166,49 @@ func (s *DBStorage) GetWithdrawals(userID int64) ([]Transaction, error) {
 
 	transactions := make([]Transaction, 0)
 	for rows.Next() {
-		var orderID int64
-		var amount float32
-		var processedAt time.Time
-		err := rows.Scan(&orderID, &amount, &processedAt)
+		type Row struct {
+			OrderID     int64
+			Amount      float32
+			ProcessedAt time.Time
+		}
+		var row Row
+		err := rows.Scan(&row)
 		if err != nil {
 			return nil, err
 		}
 
 		transactions = append(transactions, Transaction{
-			OrderID:     orderID,
-			Amount:      amount,
-			ProcessedAt: processedAt,
+			OrderID:     row.OrderID,
+			Amount:      row.Amount,
+			ProcessedAt: row.ProcessedAt,
 		})
 	}
 
 	return transactions, nil
+}
+
+func (s *DBStorage) UpdateOrderStatus(orderID int64, status api.OrderStatus) error {
+	_, err := s.Pool.Exec(context.Background(), `UPDATE orders SET status = $1 WHERE order_id = $2`, status.ToValue(), orderID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *DBStorage) ProcessOrder(userID int64, orderID int64, accrual float32) error {
+	conn, _ := s.Pool.Acquire(context.Background())
+	defer conn.Release()
+
+	_, err := conn.Exec(context.Background(), `UPDATE orders SET accrual = $1, status = $2 WHERE order_id = $3;`, accrual, api.OrderStatusPROCESSED.ToValue(), orderID)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Exec(context.Background(), `UPDATE balances SET amount = amount + $1 WHERE user_id = $2`, accrual, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

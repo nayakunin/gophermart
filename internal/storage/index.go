@@ -24,6 +24,7 @@ func initDB(conn *pgxpool.Conn) error {
 		order_id bigint UNIQUE NOT NULL,
 		user_id INTEGER NOT NULL,
 		status VARCHAR(255) NOT NULL,
+		accrual numeric(10, 2),
 		uploaded_at TIMESTAMP NOT NULL DEFAULT now(),
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
@@ -45,9 +46,8 @@ func initDB(conn *pgxpool.Conn) error {
 		user_id INTEGER NOT NULL,
 		order_id bigint NOT NULL,
 		amount numeric(10, 2) NOT NULL,
-		processed_at TIMESTAMP NOT NULL,
-		FOREIGN KEY (user_id) REFERENCES users(id),
-		FOREIGN KEY (order_id) REFERENCES orders(order_id)
+		processed_at TIMESTAMP NOT NULL DEFAULT now(),
+		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`)
 	if err != nil {
 		return err

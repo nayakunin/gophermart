@@ -18,9 +18,8 @@ func (s Server) GetAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.Re
 
 	apiOrders := make([]api.GetOrdersOrder, 0, len(orders))
 	for _, order := range orders {
-		accrual := float32(0.0)
 		apiOrders = append(apiOrders, api.GetOrdersOrder{
-			Accrual:    &accrual,
+			Accrual:    order.Accrual,
 			Number:     strconv.FormatInt(order.ID, 10),
 			Status:     order.Status,
 			UploadedAt: order.UploadedAt,

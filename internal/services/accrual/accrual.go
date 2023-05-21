@@ -39,27 +39,27 @@ type Accrual struct {
 	Accrual float32 `json:"accrual"`
 }
 
-func (s *Service) GetAccrual(orderID int64) (*Accrual, error) {
+func (s *Service) GetAccrual(orderID int64) (*resty.Response, *Accrual, error) {
 	var accrual Accrual
-	req, err := s.client.R().
+	resp, err := s.client.R().
 		SetResult(&accrual).
 		Get(fmt.Sprintf("/api/orders/%d", orderID))
 
 	if err != nil {
-		return nil, err
+		return resp, nil, err
 	}
 
-	if req.StatusCode() != http.StatusOK {
-		if req.StatusCode() == http.StatusNoContent {
-			return nil, ErrNoContent
+	if resp.StatusCode() != http.StatusOK {
+		if resp.StatusCode() == http.StatusNoContent {
+			return resp, nil, ErrNoContent
 		}
 
-		if req.StatusCode() == http.StatusTooManyRequests {
-			return nil, ErrTooManyRequests
+		if resp.StatusCode() == http.StatusTooManyRequests {
+			return resp, nil, ErrTooManyRequests
 		}
 
-		return nil, fmt.Errorf("unexpected status code: %d", req.StatusCode())
+		return resp, nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
 	}
 
-	return &accrual, nil
+	return resp, &accrual, nil
 }
