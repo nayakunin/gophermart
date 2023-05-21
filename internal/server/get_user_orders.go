@@ -5,11 +5,12 @@ import (
 	"strconv"
 
 	api "github.com/nayakunin/gophermart/internal/generated"
+	"github.com/nayakunin/gophermart/internal/middlewares"
 )
 
 func (s Server) GetAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.Response {
 	response := api.Response{}
-	userID := r.Context().Value("userID").(int64)
+	userID := r.Context().Value(middlewares.AuthKey).(int64)
 
 	orders, err := s.Storage.GetOrders(userID)
 	if err != nil {
