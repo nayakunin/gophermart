@@ -38,11 +38,8 @@ func (w *Worker) AddOrder(userID int64, orderID int64) {
 }
 
 func (w *Worker) Start() {
-	for {
-		select {
-		case order := <-w.queue:
-			w.processOrder(order)
-		}
+	for order := range w.queue {
+		w.processOrder(order)
 	}
 }
 

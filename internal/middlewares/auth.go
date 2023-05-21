@@ -10,6 +10,8 @@ import (
 	"github.com/nayakunin/gophermart/internal/config"
 )
 
+const AuthKey = "userID"
+
 func Auth(cfg config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +56,7 @@ func Auth(cfg config.Config) func(http.Handler) http.Handler {
 				return
 			}
 
-			r = r.WithContext(context.WithValue(r.Context(), "userID", userID))
+			r = r.WithContext(context.WithValue(r.Context(), AuthKey, userID))
 
 			next.ServeHTTP(w, r)
 		})
