@@ -10,7 +10,9 @@ import (
 	"github.com/nayakunin/gophermart/internal/config"
 )
 
-const AuthKey = "userID"
+type AuthKeyType string
+
+const AuthKey AuthKeyType = "userID"
 
 func Auth(cfg config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
