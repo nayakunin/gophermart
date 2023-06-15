@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	api "github.com/nayakunin/gophermart/internal/generated"
+	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/middlewares"
 )
 
@@ -14,6 +15,7 @@ func (s Server) GetAPIUserWithdrawals(_ http.ResponseWriter, r *http.Request) *a
 
 	withdrawals, err := s.Storage.GetWithdrawals(userID)
 	if err != nil {
+		logger.Errorf("failed to get withdrawals: %v", err)
 		return response.Status(http.StatusInternalServerError)
 	}
 

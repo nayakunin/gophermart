@@ -8,6 +8,7 @@ import (
 
 	"github.com/nayakunin/gophermart/internal/auth"
 	api "github.com/nayakunin/gophermart/internal/generated"
+	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
 
@@ -22,23 +23,29 @@ func (s Server) PostAPIUserRegister(w http.ResponseWriter, r *http.Request) *api
 	var req api.PostAPIUserRegisterJSONBody
 	err = json.Unmarshal(body, &req)
 	if err != nil {
+		logger.Errorf("failed to unmarshal body: %v", err)
 		return response.Status(http.StatusBadRequest)
 	}
 
 	if len(req.Login) == 0 || len(req.Password) == 0 {
+		logger.Errorf("empty login or password")
 		return response.Status(http.StatusBadRequest)
 	}
 
 	userID, err := s.Storage.CreateUser(req.Login, req.Password)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExists) {
+			logger.Errorf("failed to create user (user exists): %v", err)
 			return response.Status(http.StatusConflict)
 		}
+
+		logger.Errorf("failed to create user: %v", err)
 		return response.Status(http.StatusInternalServerError)
 	}
 
 	tokenString, err := auth.CreateToken(userID, s.Cfg.JWTSecret)
 	if err != nil {
+		logger.Errorf("failed to create token: %v", err)
 		return response.Status(http.StatusInternalServerError)
 	}
 

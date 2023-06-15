@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	api "github.com/nayakunin/gophermart/internal/generated"
+	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/middlewares"
 )
 
@@ -14,6 +15,7 @@ func (s Server) GetAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.Re
 
 	orders, err := s.Storage.GetOrders(userID)
 	if err != nil {
+		logger.Errorf("failed to get orders: %v", err)
 		return response.Status(http.StatusInternalServerError)
 	}
 

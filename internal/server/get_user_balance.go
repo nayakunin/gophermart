@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	api "github.com/nayakunin/gophermart/internal/generated"
+	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/middlewares"
 )
 
@@ -14,6 +15,7 @@ func (s Server) GetAPIUserBalance(_ http.ResponseWriter, r *http.Request) *api.R
 
 	current, withdrawn, err := s.Storage.GetBalance(userID)
 	if err != nil {
+		logger.Errorf("failed to get balance: %v", err)
 		return response.Status(http.StatusInternalServerError)
 	}
 
