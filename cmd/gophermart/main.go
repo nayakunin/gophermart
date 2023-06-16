@@ -12,6 +12,7 @@ import (
 	"github.com/nayakunin/gophermart/internal/middlewares"
 	"github.com/nayakunin/gophermart/internal/server"
 	"github.com/nayakunin/gophermart/internal/services/accrual"
+	"github.com/nayakunin/gophermart/internal/services/worker"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
 
@@ -34,7 +35,9 @@ func main() {
 
 	accrualService := accrual.NewAccrualService(c.AccrualSystemAddress)
 
-	apiImpl := server.NewServer(dbStorage, *c, accrualService)
+	w := worker.NewWorker(accrualService, dbStorage)
+
+	apiImpl := server.NewServer(dbStorage, *c, w)
 
 	/**
 	 * Auth middleware is only applied to the routes that are specified in the api/schema.yaml

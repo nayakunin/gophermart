@@ -1,4 +1,4 @@
-package server
+package worker
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/services/accrual"
-	"github.com/nayakunin/gophermart/internal/storage"
 )
 
 const MaxRequests = 10
@@ -17,12 +16,12 @@ type Order struct {
 }
 
 type Worker struct {
-	accrual *accrual.Service
-	storage *storage.DBStorage
+	accrual AccrualService
+	storage Storage
 	queue   chan Order
 }
 
-func NewWorker(accrual *accrual.Service, storage *storage.DBStorage) *Worker {
+func NewWorker(accrual AccrualService, storage Storage) *Worker {
 	return &Worker{
 		accrual: accrual,
 		storage: storage,

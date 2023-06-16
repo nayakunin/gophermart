@@ -2,25 +2,19 @@ package server
 
 import (
 	"github.com/nayakunin/gophermart/internal/config"
-	"github.com/nayakunin/gophermart/internal/services/accrual"
-	"github.com/nayakunin/gophermart/internal/storage"
 )
 
 type Server struct {
-	Worker  *Worker
-	Accrual *accrual.Service
-	Storage *storage.DBStorage
+	Worker  Worker
+	Storage Storage
 	Cfg     config.Config
 }
 
-func NewServer(dbStorage *storage.DBStorage, cfg config.Config, accrualService *accrual.Service) Server {
-	worker := NewWorker(accrualService, dbStorage)
-
-	go worker.Start()
+func NewServer(dbStorage Storage, cfg config.Config, w Worker) Server {
+	go w.Start()
 
 	return Server{
-		Worker:  worker,
-		Accrual: accrualService,
+		Worker:  w,
 		Storage: dbStorage,
 		Cfg:     cfg,
 	}
