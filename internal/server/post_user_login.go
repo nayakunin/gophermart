@@ -44,7 +44,7 @@ func (s Server) PostAPIUserLogin(w http.ResponseWriter, r *http.Request) *api.Re
 		return response.Status(http.StatusInternalServerError)
 	}
 
-	tokenString, err := auth.CreateToken(userID, s.Cfg.JWTSecret)
+	tokenString, err := auth.CreateToken(s.Cfg, userID)
 	if err != nil {
 		logger.Errorf("failed to create token: %v", err)
 		return response.Status(http.StatusInternalServerError)

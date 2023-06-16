@@ -9,14 +9,13 @@ import (
 
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/logger"
-	"github.com/nayakunin/gophermart/internal/middlewares"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
 
 func (s Server) PostAPIUserBalanceWithdraw(_ http.ResponseWriter, r *http.Request) *api.Response {
 	response := api.Response{}
 
-	userID := r.Context().Value(middlewares.AuthKey).(int64)
+	userID := r.Context().Value(s.Cfg.AuthKey).(int64)
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

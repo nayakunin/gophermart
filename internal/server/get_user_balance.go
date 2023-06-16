@@ -5,13 +5,12 @@ import (
 
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/logger"
-	"github.com/nayakunin/gophermart/internal/middlewares"
 )
 
 func (s Server) GetAPIUserBalance(_ http.ResponseWriter, r *http.Request) *api.Response {
 	response := api.Response{}
 
-	userID := r.Context().Value(middlewares.AuthKey).(int64)
+	userID := r.Context().Value(s.Cfg.AuthKey).(int64)
 
 	current, withdrawn, err := s.Storage.GetBalance(userID)
 	if err != nil {
