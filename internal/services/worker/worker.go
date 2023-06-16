@@ -2,9 +2,9 @@ package worker
 
 import (
 	"errors"
-	"time"
 
 	api "github.com/nayakunin/gophermart/internal/generated"
+	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/services/accrual"
 )
 
@@ -38,28 +38,22 @@ func (w *Worker) AddOrder(userID int64, orderID int64) {
 
 func (w *Worker) Start() {
 	for order := range w.queue {
-		w.processOrder(order)
+		go func(order Order) {
+			if err := w.processOrder(order); err != nil {
+				logger.Errorf("failed to process order: %v", err)
+			}
+		}(order)
 	}
 }
 
-func (w *Worker) processOrder(order Order) {
-	resp, accr, err := w.accrual.GetAccrual(order.id)
+func (w *Worker) processOrder(order Order) error {
+	accr, err := w.accrual.GetAccrual(order.id)
 	if err != nil {
-		if errors.Is(err, accrual.ErrTooManyRequests) {
-			retryAfter, err := time.ParseDuration(resp.Header().Get("Retry-After") + "s")
-			if err != nil {
-				return
-			}
-
-			time.Sleep(retryAfter)
-			w.queue <- order
-		}
-
 		if errors.Is(err, accrual.ErrNoContent) {
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	switch accr.Status {
@@ -68,18 +62,20 @@ func (w *Worker) processOrder(order Order) {
 	case accrual.StatusInvalid:
 		err := w.storage.UpdateOrderStatus(order.id, api.OrderStatusINVALID)
 		if err != nil {
-			return
+			return err
 		}
 	case accrual.StatusProcessing:
 		w.queue <- order
 		err := w.storage.UpdateOrderStatus(order.id, api.OrderStatusPROCESSING)
 		if err != nil {
-			return
+			return err
 		}
 	case accrual.StatusProcessed:
 		err := w.storage.ProcessOrder(order.userID, order.id, accr.Accrual)
 		if err != nil {
-			return
+			return err
 		}
 	}
+
+	return nil
 }

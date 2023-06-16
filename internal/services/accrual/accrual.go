@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/nayakunin/gophermart/internal/logger"
 )
 
 var (
-	ErrNoContent       = errors.New("no content")
-	ErrTooManyRequests = errors.New("too many requests")
+	ErrNoContent = errors.New("no content")
 )
 
 const (
@@ -40,31 +40,37 @@ type Accrual struct {
 	Accrual float32 `json:"accrual"`
 }
 
-func (s *Service) GetAccrual(orderID int64) (*resty.Response, *Accrual, error) {
-	var accrual Accrual
-	resp, err := s.client.R().
-		SetResult(&accrual).
-		Get(fmt.Sprintf("/api/orders/%d", orderID))
-
-	if err != nil {
-		logger.Errorf("failed to get accrual: %v", err)
-		return resp, nil, err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		if resp.StatusCode() == http.StatusNoContent {
-			logger.Errorf("no content")
-			return resp, nil, ErrNoContent
+func (s *Service) GetAccrual(orderID int64) (*Accrual, error) {
+	for {
+		var accrual Accrual
+		resp, err := s.client.R().
+			SetResult(&accrual).
+			Get(fmt.Sprintf("/api/orders/%d", orderID))
+		if err != nil {
+			logger.Errorf("failed to get accrual: %v", err)
+			return nil, err
 		}
 
-		if resp.StatusCode() == http.StatusTooManyRequests {
-			logger.Errorf("too many requests")
-			return resp, nil, ErrTooManyRequests
+		if resp.StatusCode() != http.StatusOK {
+			if resp.StatusCode() == http.StatusNoContent {
+				logger.Errorf("no content")
+				return nil, ErrNoContent
+			}
+
+			if resp.StatusCode() == http.StatusTooManyRequests {
+				logger.Errorf("too many requests")
+				retryAfter, err := time.ParseDuration(resp.Header().Get("Retry-After") + "s")
+				if err != nil {
+					return nil, err
+				}
+				time.Sleep(retryAfter)
+				continue
+			}
+
+			logger.Errorf("unexpected status code: %d", resp.StatusCode())
+			return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
 		}
 
-		logger.Errorf("unexpected status code: %d", resp.StatusCode())
-		return resp, nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
+		return &accrual, nil
 	}
-
-	return resp, &accrual, nil
 }

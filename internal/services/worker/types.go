@@ -1,13 +1,12 @@
 package worker
 
 import (
-	"github.com/go-resty/resty/v2"
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/services/accrual"
 )
 
 type AccrualService interface {
-	GetAccrual(orderID int64) (*resty.Response, *accrual.Accrual, error)
+	GetAccrual(orderID int64) (*accrual.Accrual, error)
 }
 
 type Storage interface {
