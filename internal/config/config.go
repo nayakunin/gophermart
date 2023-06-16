@@ -6,6 +6,8 @@ import (
 	"github.com/caarlos0/env/v7"
 )
 
+type AuthKeyType string
+
 const RunAddress = "http://localhost:8080"
 const DatabaseURI = "postgresql://localhost:5432/postgres"
 const AccrualSystemAddress = "http://localhost:8081"
@@ -16,6 +18,7 @@ type Config struct {
 	DataBaseURI          string `env:"DATABASE_URI"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 	JWTSecret            string `env:"JWT_SECRET"`
+	AuthKey              AuthKeyType
 }
 
 func LoadConfig() (*Config, error) {

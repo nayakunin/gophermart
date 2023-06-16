@@ -10,10 +10,6 @@ import (
 	"github.com/nayakunin/gophermart/internal/config"
 )
 
-type AuthKeyType string
-
-const AuthKey AuthKeyType = "userID"
-
 func Auth(cfg config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +42,7 @@ func Auth(cfg config.Config) func(http.Handler) http.Handler {
 				return
 			}
 
-			userIDString, ok := claims["userID"].(string)
+			userIDString, ok := claims[string(cfg.AuthKey)].(string)
 			if !ok {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
@@ -58,7 +54,7 @@ func Auth(cfg config.Config) func(http.Handler) http.Handler {
 				return
 			}
 
-			r = r.WithContext(context.WithValue(r.Context(), AuthKey, userID))
+			r = r.WithContext(context.WithValue(r.Context(), cfg.AuthKey, userID))
 
 			next.ServeHTTP(w, r)
 		})
