@@ -25,7 +25,7 @@ type Service struct {
 	client *resty.Client
 }
 
-func NewAccrualService(url string) *Service {
+func NewService(url string) *Service {
 	client := resty.New()
 	client.SetBaseURL(url)
 

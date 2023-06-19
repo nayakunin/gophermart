@@ -133,18 +133,14 @@ func (s *DBStorage) GetOrders(userID int64) ([]Order, error) {
 	return orders, nil
 }
 
-func (s *DBStorage) GetBalance(userID int64) (float32, float32, error) {
-	type balanceRow struct {
-		Amount   float32
-		Withdraw float32
-	}
-	var row balanceRow
-	err := s.Pool.QueryRow(context.Background(), `SELECT (amount, withdrawn) FROM balances WHERE user_id = $1`, userID).Scan(&row)
+func (s *DBStorage) GetBalance(userID int64) (Balance, error) {
+	var balance Balance
+	err := s.Pool.QueryRow(context.Background(), `SELECT (amount, withdrawn) FROM balances WHERE user_id = $1`, userID).Scan(&balance)
 	if err != nil {
-		return 0, 0, err
+		return balance, err
 	}
 
-	return row.Amount, row.Withdraw, err
+	return balance, err
 }
 
 func (s *DBStorage) Withdraw(userID, orderID int64, amount float32) error {

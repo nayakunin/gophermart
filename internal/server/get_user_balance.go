@@ -12,14 +12,14 @@ func (s Server) GetAPIUserBalance(_ http.ResponseWriter, r *http.Request) *api.R
 
 	userID := r.Context().Value(s.Cfg.AuthKey).(int64)
 
-	current, withdrawn, err := s.Storage.GetBalance(userID)
+	balance, err := s.Storage.GetBalance(userID)
 	if err != nil {
 		logger.Errorf("failed to get balance: %v", err)
 		return response.Status(http.StatusInternalServerError)
 	}
 
 	return api.GetAPIUserBalanceJSON200Response(api.Balance{
-		Current:   current,
-		Withdrawn: withdrawn,
+		Current:   balance.Amount,
+		Withdrawn: balance.Withdrawn,
 	})
 }

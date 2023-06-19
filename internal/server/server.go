@@ -5,17 +5,21 @@ import (
 )
 
 type Server struct {
-	Worker  Worker
-	Storage Storage
-	Cfg     config.Config
+	Worker          Worker
+	Storage         Storage
+	TokenService    TokenService
+	Cfg             config.Config
+	ChecksumService ChecksumService
 }
 
-func NewServer(dbStorage Storage, cfg config.Config, w Worker) Server {
+func NewServer(dbStorage Storage, cfg config.Config, w Worker, tokenService TokenService, checksumService ChecksumService) Server {
 	go w.Start()
 
 	return Server{
-		Worker:  w,
-		Storage: dbStorage,
-		Cfg:     cfg,
+		Worker:          w,
+		Storage:         dbStorage,
+		Cfg:             cfg,
+		TokenService:    tokenService,
+		ChecksumService: checksumService,
 	}
 }

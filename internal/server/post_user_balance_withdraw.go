@@ -20,7 +20,7 @@ func (s Server) PostAPIUserBalanceWithdraw(_ http.ResponseWriter, r *http.Reques
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Errorf("failed to read body: %v", err)
-		return response.Status(http.StatusInternalServerError)
+		return response.Status(http.StatusBadRequest)
 	}
 
 	var req api.PostAPIUserBalanceWithdrawJSONRequestBody

@@ -20,8 +20,6 @@ type Order struct {
 }
 
 type Balance struct {
-	ID        int64
-	UserID    int64
 	Amount    float32
 	Withdrawn float32
 }

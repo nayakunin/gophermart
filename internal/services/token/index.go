@@ -1,4 +1,4 @@
-package auth
+package token
 
 import (
 	"strconv"
@@ -7,7 +7,9 @@ import (
 	"github.com/nayakunin/gophermart/internal/config"
 )
 
-func CreateToken(cfg config.Config, userID int64) (string, error) {
+type Service struct{}
+
+func (s *Service) CreateToken(cfg config.Config, userID int64) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		string(cfg.AuthKey): strconv.FormatInt(userID, 10),
 	})
@@ -18,4 +20,8 @@ func CreateToken(cfg config.Config, userID int64) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func NewService() *Service {
+	return &Service{}
 }

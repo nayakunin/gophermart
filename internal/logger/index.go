@@ -16,6 +16,10 @@ func Init() {
 	logger = l.Sugar()
 }
 
+func Mock() {
+	logger = zap.NewNop().Sugar()
+}
+
 func Errorf(template string, args ...interface{}) {
 	logger.Errorf(template, args...)
 }

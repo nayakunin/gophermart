@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/nayakunin/gophermart/internal/auth"
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/storage"
@@ -44,7 +43,7 @@ func (s Server) PostAPIUserLogin(w http.ResponseWriter, r *http.Request) *api.Re
 		return response.Status(http.StatusInternalServerError)
 	}
 
-	tokenString, err := auth.CreateToken(s.Cfg, userID)
+	tokenString, err := s.TokenService.CreateToken(s.Cfg, userID)
 	if err != nil {
 		logger.Errorf("failed to create token: %v", err)
 		return response.Status(http.StatusInternalServerError)

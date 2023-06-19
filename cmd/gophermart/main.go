@@ -12,6 +12,8 @@ import (
 	"github.com/nayakunin/gophermart/internal/middlewares"
 	"github.com/nayakunin/gophermart/internal/server"
 	"github.com/nayakunin/gophermart/internal/services/accrual"
+	"github.com/nayakunin/gophermart/internal/services/checksum"
+	"github.com/nayakunin/gophermart/internal/services/token"
 	"github.com/nayakunin/gophermart/internal/services/worker"
 	"github.com/nayakunin/gophermart/internal/storage"
 )
@@ -33,16 +35,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	accrualService := accrual.NewAccrualService(c.AccrualSystemAddress)
-
+	accrualService := accrual.NewService(c.AccrualSystemAddress)
+	checkSumService := checksum.NewService()
+	tokenService := token.NewService()
 	w := worker.NewWorker(accrualService, dbStorage)
 
-	apiImpl := server.NewServer(dbStorage, *c, w)
+	apiImpl := server.NewServer(dbStorage, *c, w, tokenService, checkSumService)
 
 	/**
-	 * Auth middleware is only applied to the routes that are specified in the api/schema.yaml
+	 * Middlewares are only applied to the routes that are specified in the api/schema.yaml
 	 */
-	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("auth", middlewares.Auth(*c))))
+	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("token", middlewares.Auth(*c))))
 
 	log.Fatal(http.ListenAndServe(c.RunAddress, r))
 }

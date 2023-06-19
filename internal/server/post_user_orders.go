@@ -9,7 +9,6 @@ import (
 	api "github.com/nayakunin/gophermart/internal/generated"
 	"github.com/nayakunin/gophermart/internal/logger"
 	"github.com/nayakunin/gophermart/internal/storage"
-	"github.com/nayakunin/gophermart/internal/utils/checksum"
 )
 
 func (s Server) PostAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.Response {
@@ -28,7 +27,7 @@ func (s Server) PostAPIUserOrders(_ http.ResponseWriter, r *http.Request) *api.R
 		return response.Status(http.StatusBadRequest)
 	}
 
-	if !checksum.Valid(orderID) {
+	if !s.ChecksumService.Validate(orderID) {
 		logger.Errorf("invalid checksum")
 		return response.Status(http.StatusUnprocessableEntity)
 	}

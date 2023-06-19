@@ -46,7 +46,7 @@ paths:
         '500':
           description: Internal server error
   /api/user/orders:
-    x-go-middlewares: [auth]
+    x-go-middlewares: [token]
     post:
       summary: Create user order
       description: Create user order
@@ -88,7 +88,7 @@ paths:
         '500':
           description: Internal server error
   /api/user/balance:
-    x-go-middlewares: [auth]
+    x-go-middlewares: [token]
     get:
       summary: Get user balance
       description: Get user balance
@@ -104,7 +104,7 @@ paths:
         '500':
           description: Internal server error
   /api/user/balance/withdraw:
-    x-go-middlewares: [auth]
+    x-go-middlewares: [token]
     post:
       summary: Withdraw user balance
       description: Withdraw user balance
@@ -126,7 +126,7 @@ paths:
         '500':
           description: Internal server error
   /api/user/withdrawals:
-    x-go-middlewares: [auth]
+    x-go-middlewares: [token]
     get:
       summary: Get user withdrawals
       description: Get user withdrawals

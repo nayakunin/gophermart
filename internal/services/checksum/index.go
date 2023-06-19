@@ -1,7 +1,9 @@
 package checksum
 
-// Valid check number is valid or not based on Luhn algorithm
-func Valid(number int64) bool {
+type Service struct{}
+
+// Validate check number is valid or not based on Luhn algorithm
+func (c *Service) Validate(number int64) bool {
 	return (number%10+checksum(number/10))%10 == 0
 }
 
@@ -22,4 +24,8 @@ func checksum(number int64) int64 {
 		number = number / 10
 	}
 	return luhn % 10
+}
+
+func NewService() *Service {
+	return &Service{}
 }
