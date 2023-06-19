@@ -17,7 +17,7 @@ func TestPostAPIUserLogin(t *testing.T) {
 	userID := int64(1)
 	type args struct {
 		body           string
-		getUserIdError error
+		getUserIDError error
 		tokenResponse  string
 		tokenError     error
 	}
@@ -82,7 +82,7 @@ func TestPostAPIUserLogin(t *testing.T) {
 			name: "User not found",
 			args: args{
 				body:           `{"login": "1", "password": "1"}`,
-				getUserIdError: storage.ErrUserNotFound,
+				getUserIDError: storage.ErrUserNotFound,
 			},
 			want: want{
 				code: http.StatusUnauthorized,
@@ -92,7 +92,7 @@ func TestPostAPIUserLogin(t *testing.T) {
 			name: "Unknown storage error",
 			args: args{
 				body:           `{"login": "1", "password": "1"}`,
-				getUserIdError: fmt.Errorf("error"),
+				getUserIDError: fmt.Errorf("error"),
 			},
 			want: want{
 				code: http.StatusInternalServerError,
@@ -117,8 +117,8 @@ func TestPostAPIUserLogin(t *testing.T) {
 
 			storageParams := StorageParams{}
 
-			if tt.args.getUserIdError != nil {
-				storageParams.GetUserIDError = tt.args.getUserIdError
+			if tt.args.getUserIDError != nil {
+				storageParams.GetUserIDError = tt.args.getUserIDError
 			}
 
 			tokenServiceParams := TokenServiceParams{}
