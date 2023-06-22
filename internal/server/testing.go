@@ -89,20 +89,6 @@ func NewMockStorage(params StorageParams) Storage {
 	}
 }
 
-type MockWorker struct{}
-
-func (m MockWorker) AddOrder(_ int64, _ int64) {
-	return
-}
-
-func (m MockWorker) Start() {
-	return
-}
-
-func NewMockWorker() Worker {
-	return &MockWorker{}
-}
-
 type MockTokenService struct {
 	CreateTokenResponse string
 	CreateTokenError    error
