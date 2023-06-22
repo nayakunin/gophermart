@@ -45,7 +45,7 @@ func main() {
 	/**
 	 * Middlewares are only applied to the routes that are specified in the api/schema.yaml
 	 */
-	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("token", middlewares.Auth(*c))))
+	r.Mount("/", api.Handler(apiImpl, api.WithMiddleware("auth", middlewares.Auth(*c))))
 
 	log.Fatal(http.ListenAndServe(c.RunAddress, r))
 }
