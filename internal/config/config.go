@@ -51,5 +51,7 @@ func LoadConfig() (*Config, error) {
 		config.JWTSecret = flagsConfig.JWTSecret
 	}
 
+	config.AuthKey = "userID"
+
 	return &config, nil
 }
