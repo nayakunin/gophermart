@@ -9,6 +9,7 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang-jwt/jwt/v5 v5.0.0-rc.2
 	github.com/jackc/pgx/v5 v5.3.1
+	github.com/pkg/errors v0.8.1
 	go.uber.org/zap v1.24.0
 )
 
