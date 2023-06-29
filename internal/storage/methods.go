@@ -148,12 +148,6 @@ func (s *DBStorage) Withdraw(userID, orderID int64, amount float32) error {
 		return errors.Wrap(err, "begin transaction")
 	}
 
-	// Check if orderID exists
-	if _, err = t.Exec(context.Background(), `SELECT id FROM orders WHERE order_id = $1 AND user_id = $2`, orderID, userID); err != nil {
-		return ErrWithdrawOrderNotFound
-	}
-
-	// Check if balance is enough
 	var balance float32
 	if err = t.QueryRow(context.Background(), `SELECT amount FROM balances WHERE user_id = $1`, userID).Scan(&balance); err != nil {
 		return errors.Wrap(err, "select balance")
@@ -162,12 +156,10 @@ func (s *DBStorage) Withdraw(userID, orderID int64, amount float32) error {
 		return ErrWithdrawBalanceNotEnough
 	}
 
-	// Withdraw
 	if _, err = t.Exec(context.Background(), `UPDATE balances SET withdrawn = withdrawn + $1, amount = amount - $1 WHERE user_id = $2`, amount, userID); err != nil {
 		return errors.Wrap(err, "update balance")
 	}
 
-	// Save transaction
 	if _, err = t.Exec(context.Background(), `INSERT INTO transactions (user_id, order_id, amount) VALUES ($1, $2, $3)`, userID, orderID, amount); err != nil {
 		return errors.Wrap(err, "insert transaction")
 	}
