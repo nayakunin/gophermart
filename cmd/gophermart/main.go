@@ -19,6 +19,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+/*
+*
+
+  - There is a problem with one of the GitHub actions. There is a problem I couldn't figure out with postgresql.
+    I get the following error over and over again:
+    ```FATAL:  role "root" does not exist```.
+
+    Would be great if you could help me with this one.
+*/
 func main() {
 	logger.Init()
 
