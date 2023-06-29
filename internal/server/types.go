@@ -17,7 +17,6 @@ type Storage interface {
 
 type Worker interface {
 	AddOrder(userID int64, orderID int64)
-	Start()
 }
 
 type TokenService interface {

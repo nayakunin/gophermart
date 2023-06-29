@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -10,7 +11,7 @@ func Init() {
 	var err error
 	l, err := zap.NewProduction()
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "failed to init logger"))
 	}
 
 	logger = l.Sugar()

@@ -13,8 +13,6 @@ type Server struct {
 }
 
 func NewServer(dbStorage Storage, cfg config.Config, w Worker, tokenService TokenService, checksumService ChecksumService) Server {
-	go w.Start()
-
 	return Server{
 		Worker:          w,
 		Storage:         dbStorage,

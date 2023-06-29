@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/nayakunin/gophermart/internal/config"
+	"github.com/pkg/errors"
 )
 
 type Service struct{}
@@ -16,7 +17,7 @@ func (s *Service) CreateToken(cfg config.Config, userID int64) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(cfg.JWTSecret))
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to create token")
 	}
 
 	return tokenString, nil

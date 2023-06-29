@@ -16,6 +16,7 @@ import (
 	"github.com/nayakunin/gophermart/internal/services/token"
 	"github.com/nayakunin/gophermart/internal/services/worker"
 	"github.com/nayakunin/gophermart/internal/storage"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -27,12 +28,12 @@ func main() {
 
 	c, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "failed to load config"))
 	}
 
 	dbStorage, err := storage.NewDBStorage(c.DataBaseURI)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "failed to init db storage"))
 	}
 
 	accrualService := accrual.NewService(c.AccrualSystemAddress)

@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/caarlos0/env/v7"
+	"github.com/pkg/errors"
 )
 
 type AuthKeyType string
@@ -23,9 +24,8 @@ type Config struct {
 
 func LoadConfig() (*Config, error) {
 	var config Config
-	err := env.Parse(&config)
-	if err != nil {
-		return nil, err
+	if err := env.Parse(&config); err != nil {
+		return nil, errors.Wrap(err, "failed to parse envs")
 	}
 
 	flagsConfig := new(Config)

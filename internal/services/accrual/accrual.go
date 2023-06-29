@@ -1,13 +1,13 @@
 package accrual
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/nayakunin/gophermart/internal/logger"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -48,7 +48,7 @@ func (s *Service) GetAccrual(orderID int64) (*Accrual, error) {
 			Get(fmt.Sprintf("/api/orders/%d", orderID))
 		if err != nil {
 			logger.Errorf("failed to get accrual: %v", err)
-			return nil, err
+			return nil, errors.Wrap(err, "failed to get accrual")
 		}
 
 		if resp.StatusCode() != http.StatusOK {
@@ -61,14 +61,14 @@ func (s *Service) GetAccrual(orderID int64) (*Accrual, error) {
 				logger.Errorf("too many requests")
 				retryAfter, err := time.ParseDuration(resp.Header().Get("Retry-After") + "s")
 				if err != nil {
-					return nil, err
+					return nil, errors.Wrap(err, "failed to parse Retry-After header")
 				}
 				time.Sleep(retryAfter)
 				continue
 			}
 
 			logger.Errorf("unexpected status code: %d", resp.StatusCode())
-			return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
+			return nil, errors.Wrap(err, "unexpected status code")
 		}
 
 		return &accrual, nil
