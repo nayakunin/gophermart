@@ -227,11 +227,16 @@ func (s *DBStorage) ProcessOrder(userID int64, orderID int64, accrual float32) e
 		return errors.Wrap(err, "begin transaction")
 	}
 
+	var balance float32
+	if err = t.QueryRow(context.Background(), `SELECT amount FROM balances WHERE user_id = $1 FOR UPDATE`, userID).Scan(&balance); err != nil {
+		return errors.Wrap(err, "select balance")
+	}
+
 	if _, err = t.Exec(context.Background(), `UPDATE orders SET accrual = $1, status = $2 WHERE order_id = $3;`, accrual, api.OrderStatusPROCESSED.ToValue(), orderID); err != nil {
 		return errors.Wrap(err, "update order")
 	}
 
-	if _, err = t.Exec(context.Background(), `UPDATE balances SET amount = amount + $1 WHERE user_id = $2`, accrual, userID); err != nil {
+	if _, err = t.Exec(context.Background(), `UPDATE balances SET amount = $1 WHERE user_id = $2`, balance+accrual, userID); err != nil {
 		return errors.Wrap(err, "update balance")
 	}
 
