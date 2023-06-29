@@ -149,7 +149,7 @@ func (s *DBStorage) Withdraw(userID, orderID int64, amount float32) error {
 	}
 
 	var balance float32
-	if err = t.QueryRow(context.Background(), `SELECT amount FROM balances WHERE user_id = $1`, userID).Scan(&balance); err != nil {
+	if err = t.QueryRow(context.Background(), `SELECT amount FROM balances WHERE user_id = $1 FOR UPDATE`, userID).Scan(&balance); err != nil {
 		return errors.Wrap(err, "select balance")
 	}
 	if balance < amount {
